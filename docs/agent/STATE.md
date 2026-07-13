@@ -30,3 +30,15 @@
 - `w7s-docker` should focus on Docker packaging, Compose profiles, node identity, mesh membership, replicated metadata, artifact sync, health-based routing, backup/restore, upgrades, and optional tunnel ingress.
 - The first implementation milestone should be a one-node Docker runtime that can accept the existing W7S deploy action and expose non-unknown `/health` metadata.
 - The first multi-node milestone should deploy through node A, sync to node B, and keep serving from node B if node A stops.
+
+## Current Runtime State
+
+- The repo now has a first one-node TypeScript runtime.
+- Runtime entrypoint: `src/server.ts`.
+- Docker image build script: `scripts/build-image.sh`.
+- Compose service: `w7s` in `docker-compose.yml`.
+- Optional token-based Cloudflare Tunnel profile: `cloudflared` in `docker-compose.yml`.
+- Included deployable sample: `examples/hello-world`, with static frontend in `dist/` and backend handler in `backend/index.js`.
+- Supported deploy API: `POST /api/v1/deploy` with the archive/headers sent by `w7s-io/w7s-cloud@v1`.
+- Supported health APIs: `GET /health` and `GET /api/v1/health`.
+- Supported local direct app route: `/_w7s/:owner/:repo/*`.

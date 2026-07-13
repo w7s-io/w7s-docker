@@ -15,4 +15,5 @@
 ## W7S Cloud
 
 - Repo: `https://github.com/w7s-io/w7s-cloud`
-- Relationship: compatibility reference for the existing W7S deploy contract.
+- Local path: `/home/gnu/w7s-cloud`
+- Relationship: compatibility reference for the existing W7S deploy contract. The first `w7s-docker` deploy endpoint accepts the action's zip body plus `x-github-repository`, `x-github-branch`, `x-github-sha`, vars, and secrets headers without requiring app workflow changes beyond `deploy-url` and `token`.

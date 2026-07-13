@@ -2,7 +2,7 @@
 
 ## Current State
 
-This repo is currently a product-direction and bootstrap repository. Implementation commands should be added as code lands.
+This repo has a first one-node Docker runtime implementation. Multi-node mesh state is still planned, not implemented.
 
 ## Design References
 
@@ -15,11 +15,36 @@ This repo is currently a product-direction and bootstrap repository. Implementat
 When implementation lands, every completion that changes deploy/runtime behavior should verify:
 
 ```bash
+npm run build
+npm run test:smoke
+npm run build:image
 curl -fsS http://localhost:8787/health
 curl -fsS http://localhost:8787/api/v1/health
 ```
 
 Both health responses should expose `branch`, `commitHash`, and `deployedAt`; these values should not be `unknown` outside local development.
+
+To verify the Docker image without Compose:
+
+```bash
+docker rm -f w7s-docker-test >/dev/null 2>&1 || true
+docker run -d --name w7s-docker-test \
+  -p 18788:8787 \
+  -e W7S_DOCKER_HOST=0.0.0.0 \
+  -e W7S_DOCKER_PORT=8787 \
+  -e W7S_DOCKER_BASE_DOMAIN=localhost \
+  -e W7S_DOCKER_DEPLOY_TOKEN=test-token \
+  w7s-docker:test
+
+curl -fsS http://127.0.0.1:18788/health
+
+W7S_DEPLOY_URL=http://127.0.0.1:18788/api/v1/deploy \
+W7S_DOCKER_DEPLOY_TOKEN=test-token \
+npm run deploy:example
+
+curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/
+curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/api/hello
+```
 
 The first mesh smoke test should prove:
 

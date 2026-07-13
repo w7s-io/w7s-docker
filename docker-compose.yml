@@ -1,0 +1,41 @@
+services:
+  w7s:
+    build:
+      context: .
+      args:
+        W7S_DOCKER_BRANCH: ${W7S_DOCKER_BRANCH:-local}
+        W7S_DOCKER_COMMIT_HASH: ${W7S_DOCKER_COMMIT_HASH:-unknown}
+        W7S_DOCKER_DEPLOYED_AT: ${W7S_DOCKER_DEPLOYED_AT:-unknown}
+    image: ${W7S_DOCKER_IMAGE:-w7s-docker:local}
+    restart: unless-stopped
+    ports:
+      - "${W7S_DOCKER_PORT:-8787}:8787"
+    environment:
+      W7S_DOCKER_HOST: 0.0.0.0
+      W7S_DOCKER_PORT: 8787
+      W7S_DOCKER_DATA_DIR: /data
+      W7S_DOCKER_BASE_DOMAIN: ${W7S_DOCKER_BASE_DOMAIN:-localhost}
+      W7S_DOCKER_DEPLOY_TOKEN: ${W7S_DOCKER_DEPLOY_TOKEN:-}
+      W7S_DOCKER_BRANCH: ${W7S_DOCKER_BRANCH:-local}
+      W7S_DOCKER_COMMIT_HASH: ${W7S_DOCKER_COMMIT_HASH:-unknown}
+      W7S_DOCKER_DEPLOYED_AT: ${W7S_DOCKER_DEPLOYED_AT:-unknown}
+    volumes:
+      - w7s-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles: ["cloudflared"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    depends_on:
+      w7s:
+        condition: service_healthy
+
+volumes:
+  w7s-data:

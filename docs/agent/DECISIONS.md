@@ -23,3 +23,10 @@
 - Use Postgres as the preferred multi-node metadata store.
 - Use MinIO or another S3-compatible object store as the preferred multi-node artifact store.
 - SQLite and filesystem storage can remain valid for one-node development or minimal installs if the implementation can keep the operational split clear.
+
+## First Runtime Scope
+
+- The first implemented runtime is intentionally one-node.
+- It runs trusted deployed JavaScript backend modules in the Node.js process as an MVP compatibility path, not as the final isolation model.
+- Static assets are served before backend only on exact static matches; backend routes must run before SPA fallback so frontend apps can call backend routes like `/api/hello`.
+- Multi-node metadata, artifact replication, workerd isolation, and Postgres/MinIO are still follow-up milestones.

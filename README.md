@@ -24,3 +24,15 @@ The short version:
 - multi-node installs should replicate deployment metadata and artifacts, then let any healthy node serve synced deployments;
 - `w7s-metal` remains the single-node runtime reference;
 - `w7s-docker` owns Docker packaging, Compose profiles, node membership, artifact sync, mesh routing, backups, upgrades, and optional `cloudflared` ingress.
+
+## Current Runtime
+
+This repo now includes a first one-node Docker runtime:
+
+- `GET /health` and `GET /api/v1/health`;
+- `POST /api/v1/deploy` compatible with the archive and headers sent by `w7s-io/w7s-cloud@v1`;
+- static frontend serving from `dist/client`, `frontend/dist`, `dist`, `build`, `out`, or `public`;
+- JavaScript backend serving from `backend/index.js`, `worker/index.js`, `dist/server/index.js`, or `server/index.js`;
+- optional token-based `cloudflared` Compose profile.
+
+See [docs/vps-quickstart.md](docs/vps-quickstart.md) to run it on a VPS and deploy the included hello-world frontend/backend.
