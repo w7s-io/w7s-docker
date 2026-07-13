@@ -10,10 +10,9 @@
 
 - Repo: `https://github.com/w7s-io/w7s-metal`
 - Local path: `/home/gnu/w7s-metal`
-- Relationship: sibling non-Cloudflare runtime focused on a single Linux VPS or bare-metal host.
+- Relationship: single-node runtime reference for deploy ingestion, static serving, workerd backend execution, app metadata, logs, and health. `w7s-docker` should package and coordinate mesh nodes around this boundary rather than duplicate all single-node runtime concerns.
 
 ## W7S Cloud
 
 - Repo: `https://github.com/w7s-io/w7s-cloud`
 - Relationship: compatibility reference for the existing W7S deploy contract.
-
