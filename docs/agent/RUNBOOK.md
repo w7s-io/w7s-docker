@@ -78,6 +78,29 @@ Then set `TUNNEL_TOKEN` in the ignored local `.env` and run:
 docker compose --profile cloudflared up -d
 ```
 
+If using the locally managed tunnel created on this machine:
+
+```bash
+docker start w7s-docker-cloudflared
+cloudflared tunnel info w7s-docker-w8ws
+```
+
+The required DNS records are:
+
+```text
+deploy.w8ws.net CNAME 14387bfd-59e0-4eee-b6cf-888a8a446ffe.cfargotunnel.com proxied
+*.w8ws.net      CNAME 14387bfd-59e0-4eee-b6cf-888a8a446ffe.cfargotunnel.com proxied
+```
+
+After DNS is present, verify:
+
+```bash
+curl -fsS https://deploy.w8ws.net/health
+curl -fsS https://guerrerocarlos.w8ws.net/hello-world/api/hello
+```
+
+Known cleanup item: remove mistakenly-created DNS records `deploy.w8ws.net.inglesconliza.com` and `*.w8ws.net.inglesconliza.com` from the `inglesconliza.com` zone when DNS-write access is available.
+
 The first mesh smoke test should prove:
 
 1. deploy through node A;

@@ -54,3 +54,22 @@
   - backend path: `/hello-world/api/hello`.
 - Public DNS for `deploy.w8ws.net` and `guerrerocarlos.w8ws.net` did not resolve from this machine during the test.
 - Direct public access to `181.91.84.118:8788` timed out during the test, so internet exposure still needs Cloudflare Tunnel token/config or firewall/DNS changes.
+
+## Cloudflare Tunnel State
+
+- On 2026-07-14, a Cloudflare Tunnel named `w7s-docker-w8ws` was created in the Carlos CF Account.
+- Tunnel id: `14387bfd-59e0-4eee-b6cf-888a8a446ffe`.
+- Local cloudflared connector container: `w7s-docker-cloudflared`.
+- Local tunnel config path: `/home/gnu/.cloudflared/w7s-docker-w8ws/config.yml`.
+- Tunnel connector registered successfully from origin IP `181.91.84.118`.
+- The tunnel local ingress config routes:
+  - `deploy.w8ws.net` to `http://w7s:8787`;
+  - `*.w8ws.net` to `http://w7s:8787`.
+- Current blocker: the available `CLOUDFLARE_API_TOKEN` can list zones/tunnels but is not authorized to create DNS records in the `w8ws.net` zone or write remote tunnel config.
+- Needed DNS records in zone `w8ws.net`:
+  - `deploy.w8ws.net` CNAME `14387bfd-59e0-4eee-b6cf-888a8a446ffe.cfargotunnel.com`, proxied;
+  - `*.w8ws.net` CNAME `14387bfd-59e0-4eee-b6cf-888a8a446ffe.cfargotunnel.com`, proxied.
+- Mistaken records were created by `cloudflared tunnel route dns` under the origin cert's default zone:
+  - `deploy.w8ws.net.inglesconliza.com`;
+  - `*.w8ws.net.inglesconliza.com`.
+  These should be deleted from the `inglesconliza.com` DNS zone when DNS-write access is available.
