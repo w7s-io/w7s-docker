@@ -46,6 +46,38 @@ curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/
 curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/api/hello
 ```
 
+## Local w8ws.net Test
+
+Port `8787` is already used by `codex-cli-over-telegram` on this machine. Use port `8788` for local `w8ws.net` testing:
+
+```bash
+docker compose up -d --build w7s
+curl -fsS http://127.0.0.1:8788/health
+
+W7S_DEPLOY_URL=http://127.0.0.1:8788/api/v1/deploy \
+W7S_DOCKER_DEPLOY_TOKEN=<local-token-from-.env> \
+npm run deploy:example
+
+curl -fsS -H 'Host: guerrerocarlos.w8ws.net' \
+  http://127.0.0.1:8788/hello-world/
+
+curl -fsS -H 'Host: guerrerocarlos.w8ws.net' \
+  http://127.0.0.1:8788/hello-world/api/hello
+```
+
+For public `*.w8ws.net` traffic, configure Cloudflare Tunnel public hostnames:
+
+```text
+deploy.w8ws.net         -> http://w7s:8787
+*.w8ws.net              -> http://w7s:8787
+```
+
+Then set `TUNNEL_TOKEN` in the ignored local `.env` and run:
+
+```bash
+docker compose --profile cloudflared up -d
+```
+
 The first mesh smoke test should prove:
 
 1. deploy through node A;

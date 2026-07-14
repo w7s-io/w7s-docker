@@ -42,3 +42,15 @@
 - Supported deploy API: `POST /api/v1/deploy` with the archive/headers sent by `w7s-io/w7s-cloud@v1`.
 - Supported health APIs: `GET /health` and `GET /api/v1/health`.
 - Supported local direct app route: `/_w7s/:owner/:repo/*`.
+
+## Local w8ws.net Test State
+
+- On 2026-07-14, this machine ran the Docker Compose service with `W7S_DOCKER_BASE_DOMAIN=w8ws.net`.
+- Local published port: `8788` because `127.0.0.1:8787` is owned by `codex-cli-over-telegram`.
+- Container: `w7s-docker-w7s-1`.
+- Local health verified at `http://127.0.0.1:8788/health`.
+- Hello-world deployment verified with host routing for `guerrerocarlos.w8ws.net`:
+  - frontend path: `/hello-world/`;
+  - backend path: `/hello-world/api/hello`.
+- Public DNS for `deploy.w8ws.net` and `guerrerocarlos.w8ws.net` did not resolve from this machine during the test.
+- Direct public access to `181.91.84.118:8788` timed out during the test, so internet exposure still needs Cloudflare Tunnel token/config or firewall/DNS changes.
