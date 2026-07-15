@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import type { D1BindingManifest } from "./manifest.js";
 
 export interface DeploymentRecord {
   id: string;
@@ -12,6 +13,10 @@ export interface DeploymentRecord {
   staticRoot?: string;
   backendEntrypoint?: string;
   customDomains: string[];
+  bindings: {
+    kv: string[];
+    d1: D1BindingManifest[];
+  };
 }
 
 export interface Store {

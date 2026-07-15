@@ -33,6 +33,9 @@ This repo now includes a first one-node Docker runtime:
 - `POST /api/v1/deploy` compatible with the archive and headers sent by `w7s-io/w7s-cloud@v1`;
 - static frontend serving from `dist/client`, `frontend/dist`, `dist`, `build`, `out`, or `public`;
 - JavaScript backend serving from `backend/index.js`, `worker/index.js`, `dist/server/index.js`, or `server/index.js`;
+- `w7s.json` parsing for `vars`, `secrets`, `bindings.kv`, and `bindings.d1`;
+- local KV bindings backed by SQLite;
+- local D1-style SQL bindings backed by SQLite, with deploy-time SQL migrations;
 - optional token-based `cloudflared` Compose profile.
 
 See [docs/vps-quickstart.md](docs/vps-quickstart.md) to run it on a VPS and deploy the included hello-world frontend/backend.

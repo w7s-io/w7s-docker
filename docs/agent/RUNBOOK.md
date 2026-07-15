@@ -46,6 +46,13 @@ curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/
 curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/api/hello
 ```
 
+For binding changes, the backend response should include increasing `kvCount` and `dbCount` across repeated calls:
+
+```bash
+curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/api/hello
+curl -fsS http://127.0.0.1:18788/_w7s/guerrerocarlos/hello-world/api/hello
+```
+
 ## Local w8ws.net Test
 
 Port `8787` is already used by `codex-cli-over-telegram` on this machine. Use port `8788` for local `w8ws.net` testing:
@@ -98,6 +105,8 @@ After DNS is present, verify:
 curl -fsS https://deploy.w8ws.net/health
 curl -fsS https://guerrerocarlos.w8ws.net/hello-world/api/hello
 ```
+
+For the current hello-world app, repeated public backend calls should increment both `kvCount` and `dbCount`.
 
 Known cleanup item: remove mistakenly-created DNS records `deploy.w8ws.net.inglesconliza.com` and `*.w8ws.net.inglesconliza.com` from the `inglesconliza.com` zone when DNS-write access is available.
 

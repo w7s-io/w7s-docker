@@ -1,0 +1,8 @@
+{
+  "vars": ["PUBLIC_MESSAGE"],
+  "secrets": ["PRIVATE_MESSAGE"],
+  "bindings": {
+    "kv": ["CACHE"],
+    "d1": [{ "binding": "DB", "migrations": "migrations" }]
+  }
+}

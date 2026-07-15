@@ -16,6 +16,8 @@
     "test:smoke": "tsx test/smoke.ts"
   },
   "dependencies": {
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1",
     "yauzl": "^3.2.0"
   },
   "devDependencies": {

@@ -12,6 +12,8 @@ const exampleDir = path.join(repoRoot, "examples", "hello-world");
 const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "w7s-example-"));
 const zipPath = path.join(tempDir, "hello-world.zip");
 
+const encodeHeader = (value: Record<string, string>): string => Buffer.from(JSON.stringify(value), "utf8").toString("base64url");
+
 const addDir = async (zip: yazl.ZipFile, dir: string, prefix = ""): Promise<void> => {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -41,7 +43,9 @@ try {
       "content-type": "application/zip",
       "x-github-repository": "guerrerocarlos/hello-world",
       "x-github-branch": "main",
-      "x-github-sha": "example-local"
+      "x-github-sha": "example-local",
+      "x-w7s-vars": encodeHeader({ PUBLIC_MESSAGE: process.env.W7S_EXAMPLE_PUBLIC_MESSAGE || "Hello from a W7S var" }),
+      "x-w7s-secrets": encodeHeader({ PRIVATE_MESSAGE: process.env.W7S_EXAMPLE_PRIVATE_MESSAGE || "local-demo-secret" })
     },
     body: archive
   });

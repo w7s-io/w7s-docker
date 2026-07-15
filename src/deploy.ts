@@ -3,9 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { extractZipBuffer } from "./archive.js";
+import { applyD1Migrations, runtimeMetadataPath } from "./bindings.js";
 import type { Config } from "./config.js";
 import { backendEntrypoints, staticRoots } from "./detectors.js";
 import { firstHeader, getBearerToken, readBody, sendJson } from "./http.js";
+import { decodeHeaderBindings, readManifest } from "./manifest.js";
 import { environmentFromBranch, splitRepository } from "./names.js";
 import { deploymentDir, removeDir, writeDeployment, type DeploymentRecord, type Store } from "./storage.js";
 
@@ -81,7 +83,11 @@ export const handleDeployRequest = async (
     environment,
     commitHash,
     deployedAt,
-    customDomains: []
+    customDomains: [],
+    bindings: {
+      kv: [],
+      d1: []
+    }
   };
 
   const dir = deploymentDir(store, record);
@@ -97,6 +103,8 @@ export const handleDeployRequest = async (
   record.staticRoot = await findFirstExisting(sourceDir, staticRoots);
   record.backendEntrypoint = await findFirstExisting(sourceDir, backendEntrypoints);
   record.customDomains = await readCustomDomains(sourceDir);
+  const manifest = await readManifest(sourceDir);
+  record.bindings = manifest.bindings;
 
   if (!record.staticRoot && !record.backendEntrypoint) {
     sendJson(response, 422, {
@@ -109,6 +117,20 @@ export const handleDeployRequest = async (
   }
 
   await writeDeployment(store, record);
+  const runtimeVars = {
+    ...Object.fromEntries(manifest.vars.map((name) => [name, ""])),
+    ...decodeHeaderBindings(request.headers["x-w7s-vars"])
+  };
+  const runtimeSecrets = {
+    ...Object.fromEntries(manifest.secrets.map((name) => [name, ""])),
+    ...decodeHeaderBindings(request.headers["x-w7s-secrets"])
+  };
+  await fs.writeFile(
+    runtimeMetadataPath(store, record),
+    `${JSON.stringify({ vars: runtimeVars, secrets: runtimeSecrets }, null, 2)}\n`,
+    { mode: 0o600 }
+  );
+  await applyD1Migrations(store, record, sourceDir);
 
   sendJson(response, 200, {
     status: "success",
@@ -123,7 +145,8 @@ export const handleDeployRequest = async (
         commitHash: record.commitHash,
         deployedAt: record.deployedAt,
         staticRoot: record.staticRoot,
-        backendEntrypoint: record.backendEntrypoint
+        backendEntrypoint: record.backendEntrypoint,
+        bindings: record.bindings
       },
       deploymentWarnings:
         record.backendEntrypoint && record.backendEntrypoint.endsWith(".ts")

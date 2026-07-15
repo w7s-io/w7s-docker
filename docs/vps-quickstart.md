@@ -140,3 +140,38 @@ For a backend, include JavaScript at one of these paths:
 - `server/index.js`
 
 The backend module should export `fetch(request, env)` or a default fetch handler.
+
+## 6. Vars, Secrets, KV, And D1
+
+Declare runtime config and storage bindings in `w7s.json`:
+
+```json
+{
+  "vars": ["PUBLIC_MESSAGE"],
+  "secrets": ["PRIVATE_MESSAGE"],
+  "bindings": {
+    "kv": ["CACHE"],
+    "d1": [{ "binding": "DB", "migrations": "migrations" }]
+  }
+}
+```
+
+The existing W7S GitHub Action sends `vars` and `secrets` values through deploy headers when the values are available in the workflow environment.
+
+In a backend:
+
+```js
+export async function fetch(request, env) {
+  await env.CACHE.put("count", "1");
+  const count = await env.CACHE.get("count");
+
+  await env.DB.prepare("INSERT INTO visits (path) VALUES (?)")
+    .bind(new URL(request.url).pathname)
+    .run();
+
+  const total = await env.DB.prepare("SELECT COUNT(*) as total FROM visits").first("total");
+  return Response.json({ count, total, publicMessage: env.PUBLIC_MESSAGE });
+}
+```
+
+Migration files are plain `.sql` files under the configured migrations directory and are applied once per deployment environment.

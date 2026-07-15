@@ -42,6 +42,11 @@
 - Supported deploy API: `POST /api/v1/deploy` with the archive/headers sent by `w7s-io/w7s-cloud@v1`.
 - Supported health APIs: `GET /health` and `GET /api/v1/health`.
 - Supported local direct app route: `/_w7s/:owner/:repo/*`.
+- Supported runtime config: `w7s.json` `vars` and `secrets`, with values decoded from `x-w7s-vars` and `x-w7s-secrets`.
+- Supported storage bindings:
+  - `bindings.kv`: local SQLite-backed KV namespace with `get`, `getWithMetadata`, `put`, `delete`, and `list`.
+  - `bindings.d1`: local SQLite-backed D1-style binding with `prepare().bind().all/first/run/raw` plus `batch`.
+  - D1 migrations: `.sql` files under the configured `migrations` directory are applied once and tracked in `_w7s_migrations`.
 
 ## Local w8ws.net Test State
 
@@ -52,6 +57,7 @@
 - Hello-world deployment verified with host routing for `guerrerocarlos.w8ws.net`:
   - frontend path: `/hello-world/`;
   - backend path: `/hello-world/api/hello`.
+- On 2026-07-15, the public `https://guerrerocarlos.w8ws.net/hello-world/api/hello` route verified local KV and D1 bindings by returning increasing `kvCount` and `dbCount` values.
 - Public DNS for `deploy.w8ws.net` and `guerrerocarlos.w8ws.net` did not resolve from this machine during the test.
 - Direct public access to `181.91.84.118:8788` timed out during the test, so internet exposure still needs Cloudflare Tunnel token/config or firewall/DNS changes.
 

@@ -1,9 +1,11 @@
 import { pathToFileURL } from "node:url";
+import fs from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { createRuntimeBindings, runtimeMetadataPath } from "./bindings.js";
 import type { DeploymentRecord, Store } from "./storage.js";
 import { deploymentDir } from "./storage.js";
 
-type FetchHandler = (request: Request, env: Record<string, string>) => Response | Promise<Response>;
+type FetchHandler = (request: Request, env: Record<string, unknown>) => Response | Promise<Response>;
 
 const moduleCache = new Map<string, { mtimeMs: number; handler: FetchHandler }>();
 
@@ -70,6 +72,14 @@ export const handleBackend = async (
     duplex: body ? "half" : undefined
   } as RequestInit);
 
+  let runtimeMetadata: { vars?: Record<string, string>; secrets?: Record<string, string> } = {};
+  try {
+    runtimeMetadata = JSON.parse(await fs.readFile(runtimeMetadataPath(store, record), "utf8")) as typeof runtimeMetadata;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
+
+  const bindings = await createRuntimeBindings(store, record, runtimeMetadata.vars || {}, runtimeMetadata.secrets || {});
   const backendResponse = await handler(backendRequest, {
     W7S_OWNER: record.owner,
     W7S_REPO: record.repo,
@@ -77,7 +87,8 @@ export const handleBackend = async (
     W7S_BRANCH: record.branch,
     W7S_ENVIRONMENT: record.environment,
     W7S_COMMIT_HASH: record.commitHash,
-    W7S_DEPLOYED_AT: record.deployedAt
+    W7S_DEPLOYED_AT: record.deployedAt,
+    ...bindings
   });
 
   response.writeHead(backendResponse.status, Object.fromEntries(backendResponse.headers.entries()));

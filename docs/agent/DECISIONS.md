@@ -29,4 +29,7 @@
 - The first implemented runtime is intentionally one-node.
 - It runs trusted deployed JavaScript backend modules in the Node.js process as an MVP compatibility path, not as the final isolation model.
 - Static assets are served before backend only on exact static matches; backend routes must run before SPA fallback so frontend apps can call backend routes like `/api/hello`.
-- Multi-node metadata, artifact replication, workerd isolation, and Postgres/MinIO are still follow-up milestones.
+- KV and D1-style bindings are local SQLite-backed MVP implementations scoped by owner/repo/environment/binding.
+- D1 migrations use plain SQL files from `w7s.json` `bindings.d1[].migrations` and are tracked in each local database's `_w7s_migrations` table.
+- Secrets are stored in deployment-local runtime metadata for the current MVP; this must be replaced with encrypted/managed secret storage before less-trusted multi-tenant use.
+- Multi-node metadata, artifact replication, workerd isolation, encrypted secret storage, and Postgres/MinIO are still follow-up milestones.
